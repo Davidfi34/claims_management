@@ -1,16 +1,17 @@
 package com.claims_management.consortium.Dto;
 
-import com.claims_management.address.models.Address;
-import com.claims_management.adm.models.Adm;
+import com.claims_management.address.Dto.UpdateAddress;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 
 public record UpdateConsortium(
         @NotNull
         Long id,
+        String name,
         @NotNull
-        Address address,
+        UpdateAddress address,
         @NotNull
-        Adm adm
+        Long id_adm
         ) {
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.claims_management.adm.constants.AdmConstants.REQUEST_ADM;
 import static com.claims_management.commons.constants.GlobalApiConstant.*;
 import static com.claims_management.subscriber.constants.SubscriberConstants.REQUEST_SUBSCRIBER;
 
@@ -36,9 +37,14 @@ public class SubscriberControllerImp extends GenericRestController implements Su
     }
 
     @Override
+    public ResponseEntity<CustomResponse> getAllActiveSubscribers(int numberPage) {
+        return ok(subscriberServiceImp.getAllActiveSubscriber(numberPage),null, REQUEST_SUBSCRIBER);
+    }
+
+
+    @Override
     public ResponseEntity<CustomResponse> getSubscriberById(Long id) {
-        SubscriberResponse subscriberResponse = subscriberServiceImp.getSubscriberById(id);
-        return notFound(null,NOT_FOUND,REQUEST_SUBSCRIBER);
+        return ok(subscriberServiceImp.getSubscriberById(id),CREATED,REQUEST_SUBSCRIBER);
 
     }
 

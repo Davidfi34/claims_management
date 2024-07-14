@@ -56,8 +56,11 @@ public class ServiceDataServiceImp implements ServiceDataService {
     @Override
     public void deleteService(Long id) {
         Optional<ServiceData> serviceDataOptional = serviceDataRepository.findById(id);
-        if (!serviceDataOptional.isPresent()) throw new IntegrityValidation("Service not found");
-        serviceDataRepository.deleteById(id);
+        System.out.println(serviceDataOptional.get());
+        if (serviceDataOptional.isPresent()) {
+            serviceDataRepository.deleteById(id);
+        }
+        throw new IntegrityValidation("Service not found");
     }
 
 }

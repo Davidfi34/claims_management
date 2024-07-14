@@ -5,9 +5,9 @@ import com.claims_management.adm.models.Adm;
 import com.claims_management.consortium.models.Consortium;
 
 
-public record ConsortiumResponse(Long id, Address address, Adm adm ) {
+public record ConsortiumResponse(Long id,String name, Address address, Adm adm ) {
     public ConsortiumResponse(Consortium c){
-        this(c.getId(),c.getAddress(),c.getAdm());
+        this(c.getId(), c.getName(),c.getAddress(),c.getAdm());
     }
 }
 

@@ -1,16 +1,16 @@
 package com.claims_management.consortium.service;
 
-import com.claims_management.address.Dto.AddressRequest;
 import com.claims_management.address.Dto.AddressResponse;
-import com.claims_management.address.Dto.UpdateAddress;
+import com.claims_management.address.Dto.mapper.AddressMapper;
 import com.claims_management.address.models.Address;
 import com.claims_management.address.service.AddressService;
 import com.claims_management.adm.Dto.AdmResponse;
-import com.claims_management.adm.models.Adm;
+import com.claims_management.adm.Dto.mapper.AdmMapper;
 import com.claims_management.adm.service.AdmService;
 import com.claims_management.consortium.Dto.ConsortiumRequest;
 import com.claims_management.consortium.Dto.ConsortiumResponse;
 import com.claims_management.consortium.Dto.UpdateConsortium;
+import com.claims_management.consortium.Dto.mapper.ConsortiumMapper;
 import com.claims_management.consortium.models.Consortium;
 import com.claims_management.consortium.repository.ConsortiumRepository;
 import com.claims_management.infra.errors.IntegrityValidation;
@@ -25,44 +25,49 @@ import java.util.Optional;
 public class ConsortiumServiceImp implements ConsortiumService {
 
     private final ConsortiumRepository consortiumRepository;
+    private final ConsortiumMapper consortiumMapper;
     private final AdmService admService;
     private final AddressService addressService;
+    private final AddressMapper addressMapper;
+    private final AdmMapper admMapper;
 
     public ConsortiumServiceImp(ConsortiumRepository consortiumRepository,
+                                ConsortiumMapper consortiumMapper,
                                 AdmService admService,
-                                AddressService addressService){
+                                AddressService addressService,
+                                AddressMapper addressMapper,
+                                AdmMapper admMapper
+                                ){
         this.consortiumRepository = consortiumRepository;
+        this.consortiumMapper = consortiumMapper;
         this.admService = admService;
         this.addressService = addressService;
+        this.addressMapper = addressMapper;
+        this.admMapper = admMapper;
     }
 
     @Override
     public ConsortiumResponse save(ConsortiumRequest consortiumRequest) {
-
+        //TODO: get Adm by id
         AdmResponse admResponse = admService.getAdmById(consortiumRequest.id_adm());
-        if (admResponse == null) {
-            throw new IllegalArgumentException("adm not found");
-        }
-        // save Address
-        AddressResponse addressData = addressService.save(
-                new AddressRequest(consortiumRequest.street(), consortiumRequest.number(),
-                        consortiumRequest.apartment_number(), consortiumRequest.city(),
-                        consortiumRequest.province(), consortiumRequest.postal_code()));
 
-        // Create Adm y Address
-        Adm adm = new Adm(admResponse.id(), admResponse.name(), admResponse.address(), admResponse.phone(),admResponse.email());
-        Address address = new Address(addressData.id(), addressData.street(), addressData.number(),
-                addressData.apartment_number(), addressData.city(), addressData.province(), addressData.postal_code());
+        //TODO: save Address
+        AddressResponse addressResponse = addressService.save(consortiumRequest.address());
 
-        // Create and save Consortium
-        Consortium consortium = new Consortium(null, address, adm);
+        //TODO: Create and save Consortium
+        Consortium consortium = new Consortium(null,
+                consortiumRequest.name(),
+                addressMapper.addressResponseToAddress(addressResponse),
+                admMapper.admResponseToAdm(admResponse));
         return new ConsortiumResponse(consortiumRepository.save(consortium));
     }
 
     @Override
     public ConsortiumResponse getConsortiumById(Long id) {
         Optional<Consortium> consortiumOptional = consortiumRepository.findById(id);
-        if (consortiumOptional.isPresent()) return new ConsortiumResponse(consortiumOptional.get());
+        if (consortiumOptional.isPresent()) {
+            return consortiumMapper.consortiumToConsortiumResponse(consortiumOptional.get());
+        }
         throw new IntegrityValidation("consortium not found");
     }
 
@@ -70,35 +75,33 @@ public class ConsortiumServiceImp implements ConsortiumService {
     public Page<ConsortiumResponse> getAllConsortium(int numberPage) {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(numberPage, pageSize);
-        return consortiumRepository.findAll(pageable).map(ConsortiumResponse::new);
+        return consortiumRepository.findAll(pageable)
+                .map(consortium -> consortiumMapper.consortiumToConsortiumResponse(consortium));
     }
 
     @Override
     public ConsortiumResponse updateConsortium(UpdateConsortium updateConsortium) {
+
         Optional<Consortium> consortiumOptional = consortiumRepository.findById(updateConsortium.id());
-        AddressResponse addressResponse = addressService.getAddressById(updateConsortium.address().getId());
-        AdmResponse admResponse = admService.getAdmById(updateConsortium.adm().getId());
 
-        if (addressResponse == null || admResponse == null){
-            throw new IllegalArgumentException("address or adm not found");
+        if (consortiumOptional.isPresent()) {
+            AdmResponse admResponse = admService.getAdmById(updateConsortium.id_adm());
+
+            //TODO: UPDATE ADDRESS
+            Address address = addressMapper.addressResponseToAddress(
+                        addressService.updateAddress(updateConsortium.address()));
+
+            //TODO: CREATE CONSORTIUM
+            Consortium c = new Consortium(
+                        updateConsortium.id(),
+                        updateConsortium.name(),
+                        address,
+                        admMapper.admResponseToAdm(admResponse)
+            );
+            return new ConsortiumResponse(consortiumMapper.consortiumBuild(consortiumRepository.save(c)));
         }
-        addressService.updateAddress(new UpdateAddress(addressResponse.id(),addressResponse.street(),
-                addressResponse.number(),addressResponse.apartment_number(),addressResponse.city(),
-                addressResponse.province(),addressResponse.postal_code()));
 
-        //TODO: SAVE ADDRESS
-        Address address = new Address(updateConsortium.address().getId(),updateConsortium.address().getStreet(),
-                updateConsortium.address().getNumber(),updateConsortium.address().getApartment_number(),
-                updateConsortium.address().getCity(),updateConsortium.address().getProvince(),
-                updateConsortium.address().getPostal_code());
-
-        //TODO: UPDATE ADM
-
-        if (consortiumOptional.isPresent()){
-            Consortium consortium = new Consortium(updateConsortium.id(),address,updateConsortium.adm());
-            return new ConsortiumResponse(consortiumRepository.save(consortium));
-        }
-        throw new IntegrityValidation("consortium not found");
+            throw new IntegrityValidation("consortium not found");
     }
 
     @Override

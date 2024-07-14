@@ -31,6 +31,7 @@ public class ConsortiumControllerImp extends GenericRestController implements Co
 
     @Override
     public ResponseEntity<CustomResponse> getAllConsortiums(int numberPage) {
+        System.out.println("controller get all");
         return ok(consortiumServiceImp.getAllConsortium(numberPage),null, REQUEST_CONSORTIUM);
     }
 

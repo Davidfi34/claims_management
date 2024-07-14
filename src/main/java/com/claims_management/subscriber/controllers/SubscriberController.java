@@ -8,8 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.claims_management.commons.constants.GlobalApiConstant.GENERIC_PAGINATOR_PARAM;
-import static com.claims_management.commons.constants.GlobalApiConstant.ID_PARAM;
+import static com.claims_management.commons.constants.GlobalApiConstant.*;
 
 
 public interface SubscriberController {
@@ -20,6 +19,9 @@ public interface SubscriberController {
 
     @GetMapping(GENERIC_PAGINATOR_PARAM)
     ResponseEntity<CustomResponse> getAllSubscribers(@PathVariable int numberPage);
+
+    @GetMapping(ACTIVE_PAGER_REGISTRATION)
+    ResponseEntity<CustomResponse> getAllActiveSubscribers(@PathVariable int numberPage);
 
     @GetMapping(ID_PARAM)
     ResponseEntity<CustomResponse> getSubscriberById(@Valid @PathVariable Long id);

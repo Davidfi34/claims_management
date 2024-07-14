@@ -1,7 +1,6 @@
 package com.claims_management.adm.Dto;
 
 import com.claims_management.address.Dto.UpdateAddress;
-import com.claims_management.address.models.Address;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +11,7 @@ public record UpdateAdm(
         Long id,
         @NotEmpty
         String name,
-        @NotEmpty
+
         UpdateAddress address,
         @NotEmpty
         String phone,

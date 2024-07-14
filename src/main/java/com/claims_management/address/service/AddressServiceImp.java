@@ -3,6 +3,7 @@ package com.claims_management.address.service;
 import com.claims_management.address.Dto.AddressRequest;
 import com.claims_management.address.Dto.AddressResponse;
 import com.claims_management.address.Dto.UpdateAddress;
+import com.claims_management.address.Dto.mapper.AddressMapper;
 import com.claims_management.address.models.Address;
 import com.claims_management.address.repository.AddressRepository;
 import com.claims_management.infra.errors.IntegrityValidation;
@@ -17,18 +18,17 @@ import java.util.Optional;
 public class AddressServiceImp implements AddressService {
 
     private final AddressRepository addressRepository;
+    private final AddressMapper addressMapper;
 
-    public AddressServiceImp(AddressRepository addressRepository){
+    public AddressServiceImp(AddressRepository addressRepository,AddressMapper addressMapper){
         this.addressRepository = addressRepository;
+        this.addressMapper = addressMapper;
     }
 
     @Override
     public AddressResponse save(AddressRequest addressRequest) {
-        Address address = new Address(
-                null,addressRequest.street(),addressRequest.number(),
-                addressRequest.apartment_number(),addressRequest.city(),
-                addressRequest.province(),addressRequest.postal_code());
-        return new AddressResponse(addressRepository.save(address));
+        return new AddressResponse(addressRepository.save(
+                addressMapper.addressRequestToAddress(addressRequest)));
     }
 
     @Override
@@ -49,11 +49,8 @@ public class AddressServiceImp implements AddressService {
     public AddressResponse updateAddress(UpdateAddress updateAddress) {
         Optional<Address> addressOptional = addressRepository.findById(updateAddress.id());
         if (addressOptional.isPresent()){
-            Address address = new Address(
-                    updateAddress.id(),updateAddress.street(),updateAddress.number(),
-                    updateAddress.apartment_number(),updateAddress.city(),updateAddress.province(),
-                    updateAddress.postal_code());
-            return new AddressResponse(addressRepository.save(address));
+            return new AddressResponse(addressRepository.save(
+                    addressMapper.addressUpdateToAddress(updateAddress)));
         }
         throw new IntegrityValidation("address not found");
     }

@@ -11,6 +11,7 @@ public interface SubscriberService {
     public SubscriberResponse save(SubscriberRequest subscriberRequest);
     public SubscriberResponse getSubscriberById(Long id);
     public Page<SubscriberResponse> getAllSubscriber(int numberPage);
+    public Page<SubscriberResponse> getAllActiveSubscriber(int numberPage);
     public SubscriberResponse updateSubscriber(UpdateSubscriber updateSubscriber);
     public void deleteSubscriber(Long id);
 }

@@ -36,9 +36,10 @@ public class AdmControllerImp extends GenericRestController implements AdmContro
     }
 
     @Override
-    public ResponseEntity<CustomResponse> getAdmById(Long id) {
+    public ResponseEntity getAdmById(Long id) {
         AdmResponse admResponse = admServiceImp.getAdmById(id);
-        return ok(admResponse,null,REQUEST_ADM);
+        //System.out.println(admResponse.id());
+        return ResponseEntity.ok(admResponse);//ok(admResponse,null,REQUEST_ADM);
     }
 
     @Override

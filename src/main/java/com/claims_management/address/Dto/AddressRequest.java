@@ -7,7 +7,6 @@ public record AddressRequest(
         String street,
         @NotEmpty
         String number,
-        @NotEmpty
         String apartment_number,
         @NotEmpty
         String city,

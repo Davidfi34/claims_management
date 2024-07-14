@@ -20,4 +20,5 @@ public record UpdateAddress(
         @NotEmpty
         String postal_code
         ) {
+
 }

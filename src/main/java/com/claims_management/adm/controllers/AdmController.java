@@ -20,7 +20,7 @@ public interface AdmController {
     ResponseEntity<CustomResponse> getAllAdm(@PathVariable int numberPage);
 
     @GetMapping(ID_PARAM)
-    ResponseEntity<CustomResponse> getAdmById(@PathVariable Long id);
+    ResponseEntity getAdmById(@PathVariable Long id);
 
     @PutMapping
     ResponseEntity<CustomResponse> updateAdm(@RequestBody UpdateAdm updateAdm);
