@@ -6,9 +6,11 @@ import com.claims_management.user.Dto.UserRequest;
 import com.claims_management.user.Dto.UserResponse;
 import com.claims_management.user.model.User;
 import com.claims_management.user.repository.UsersRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,6 +19,8 @@ import java.util.Optional;
 public class UserServiceImp implements UserService{
 
     private final UsersRepository usersRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserServiceImp(UsersRepository usersRepository){
         this.usersRepository = usersRepository;
@@ -24,7 +28,9 @@ public class UserServiceImp implements UserService{
 
     @Override
     public UserResponse saveUser(UserRequest userRequest) {
-        User user = new User(null,userRequest.firstname(),userRequest.lastname());
+        //TODO: pass encryption
+        User user = new User(null,userRequest.username(),
+                passwordEncoder.encode(userRequest.password()));
         return new UserResponse(usersRepository.save(user));
     }
 
@@ -46,7 +52,7 @@ public class UserServiceImp implements UserService{
     public UserResponse updateUser(UpdateUser updateUser) {
         Optional<User> userOptional = usersRepository.findById(updateUser.id());
         if (userOptional.isPresent()){
-            User user = new User(updateUser.id(),updateUser.firstname(),updateUser.lastname());
+            User user = new User(updateUser.id(),updateUser.username(),updateUser.password());
             return new UserResponse(usersRepository.save(user));
         }
         throw new IntegrityValidation("User not found");

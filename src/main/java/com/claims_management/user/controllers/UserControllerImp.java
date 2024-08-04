@@ -6,6 +6,7 @@ import com.claims_management.user.Dto.UpdateUser;
 import com.claims_management.user.Dto.UserRequest;
 import com.claims_management.user.Dto.UserResponse;
 import com.claims_management.user.service.UserServiceImp;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import static com.claims_management.commons.constants.GlobalApiConstant.*;
 
 @RestController
 @RequestMapping(REQUEST_USER)
+@SecurityRequirement(name = "bearer-key")
 public class UserControllerImp extends GenericRestController implements UserController {
 
     private final UserServiceImp userServiceImp;
